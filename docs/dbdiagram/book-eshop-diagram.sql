@@ -17,6 +17,14 @@ CREATE TABLE `addresses` (
   `zip_code` varchar(20) NOT NULL
 );
 
+CREATE TABLE `order_addresses` (
+  `id` integer PRIMARY KEY AUTO_INCREMENT,
+  `street` varchar(255) NOT NULL,
+  `city_name` varchar(100) NOT NULL,
+  `zip_code` varchar(20) NOT NULL,
+  `country_name` varchar(100) NOT NULL
+);
+
 CREATE TABLE `users` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
   `email` varchar(255) UNIQUE NOT NULL,
@@ -128,6 +136,7 @@ CREATE TABLE `orders` (
   `user_id` integer,
   `selected_store_id` integer,
   `shipping_address_id` integer,
+  `billing_address_id` integer,
   `order_type` varchar(50) NOT NULL,
   `status` varchar(50) NOT NULL,
   `total_price` decimal(10.2) NOT NULL,
@@ -138,6 +147,8 @@ CREATE TABLE `order_items` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
   `order_id` integer,
   `book_id` integer,
+  `title` varchar(255) NOT NULL,
+  `isbn` varchar(13),
   `is_ebook` boolean DEFAULT false,
   `quantity` integer NOT NULL,
   `price_per_unit` decimal(10.2) NOT NULL
@@ -174,8 +185,8 @@ CREATE TABLE `ebook_rentals` (
 
 CREATE TABLE `book_buybacks` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
-  `target_store_id` integer,
   `book_id` integer,
+  `target_store_id` integer,
   `user_id` integer,
   `book_condition` varchar(50) NOT NULL,
   `offered_price` decimal(10.2),
@@ -221,7 +232,9 @@ ALTER TABLE `orders` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 ALTER TABLE `orders` ADD FOREIGN KEY (`selected_store_id`) REFERENCES `stores` (`id`);
 
-ALTER TABLE `orders` ADD FOREIGN KEY (`shipping_address_id`) REFERENCES `addresses` (`id`);
+ALTER TABLE `orders` ADD FOREIGN KEY (`shipping_address_id`) REFERENCES `order_addresses` (`id`);
+
+ALTER TABLE `orders` ADD FOREIGN KEY (`billing_address_id`) REFERENCES `order_addresses` (`id`);
 
 ALTER TABLE `order_items` ADD FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`);
 
@@ -239,8 +252,8 @@ ALTER TABLE `ebook_rentals` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`
 
 ALTER TABLE `ebook_rentals` ADD FOREIGN KEY (`book_id`) REFERENCES `books` (`id`);
 
-ALTER TABLE `book_buybacks` ADD FOREIGN KEY (`target_store_id`) REFERENCES `stores` (`id`);
-
 ALTER TABLE `book_buybacks` ADD FOREIGN KEY (`book_id`) REFERENCES `books` (`id`);
+
+ALTER TABLE `book_buybacks` ADD FOREIGN KEY (`target_store_id`) REFERENCES `stores` (`id`);
 
 ALTER TABLE `book_buybacks` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
